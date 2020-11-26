@@ -69,25 +69,34 @@ app.post("/repositories",validateUrl,(request, response) => {
 
 });
 
-app.put("/repositories/:id", validateId,validateUrlUpdate, (request, response) => {
+app.patch("/repositories/:id", validateId,validateUrlUpdate, (request, response) => {
   // PUT /repositories/:id: A rota deve alterar apenas o title, a url e as techs do repositório que 
   // possua o id igual ao id presente nos parâmetros da rota;
   const {id} = request.params;
-  const {title, url, techs} = request.body;
+  const {title, url, techs, likes} = request.body;
 
   const repositoryIndex = repositories.findIndex(repository => repository.id === id);
 
-  const repository = {
-      id,
-      title: title ? title !== undefined : repositories[repositoryIndex].title,
-      url: url ? url !== undefined : repositories[repositoryIndex].url,
-      techs: techs ? techs !== undefined : repositories[repositoryIndex].techs,
-      likes: repositories[repositoryIndex].likes
+  console.log(likes);
+  
+  if(likes > 0){
+    const repository = {
+      likes: repositories[repositoryIndex].likes}
+      
+    return response.json(repository);
+  }else{
+    const repository = {
+        id,
+        title: title ? title !== undefined : repositories[repositoryIndex].title,
+        url: url ? url !== undefined : repositories[repositoryIndex].url,
+        techs: techs ? techs !== undefined : repositories[repositoryIndex].techs,
+        likes: repositories[repositoryIndex].likes
+    }
+    
+    repositories[repositoryIndex] = repository;
+
+    return response.json(repository);
   }
-
-  repositories[repositoryIndex] = repository;
-
-  return response.json(repository);
 });
 
 app.delete("/repositories/:id", validateId, (request, response) => {
