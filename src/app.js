@@ -69,7 +69,7 @@ app.post("/repositories",validateUrl,(request, response) => {
 
 });
 
-app.patch("/repositories/:id", validateId,validateUrlUpdate, (request, response) => {
+app.put("/repositories/:id", validateId,validateUrlUpdate, (request, response) => {
   // PUT /repositories/:id: A rota deve alterar apenas o title, a url e as techs do repositório que 
   // possua o id igual ao id presente nos parâmetros da rota;
   const {id} = request.params;
