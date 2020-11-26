@@ -29,10 +29,20 @@ function validateId(request,response,next){
 function validateUrl(request,response,next){
   const {url} = request.body;
   
-  if(url.indexOf('https://github.com/') === -1){
+  if((url === undefined) || (url.indexOf('https://github.com/') === -1) ){
     return response.status(200).json({ error:'Invalid URL !'});
   }
 
+  next();
+};
+
+function validateUrlUpdate(request,response,next){
+  const {url} = request.body;
+  if (url !== undefined){
+    if( url.indexOf('https://github.com/') === -1){
+      return response.status(200).json({ error:'Invalid URL !'});
+    }
+  }
   next();
 };
 
@@ -59,25 +69,25 @@ app.post("/repositories",validateUrl,(request, response) => {
 
 });
 
-app.put("/repositories/:id", validateId,validateUrl, (request, response) => {
+app.put("/repositories/:id", validateId,validateUrlUpdate, (request, response) => {
   // PUT /repositories/:id: A rota deve alterar apenas o title, a url e as techs do repositório que 
   // possua o id igual ao id presente nos parâmetros da rota;
   const {id} = request.params;
   const {title, url, techs} = request.body;
 
-    const repositoryIndex = repositories.findIndex(repository => repository.id === id);
+  const repositoryIndex = repositories.findIndex(repository => repository.id === id);
 
-    const repository = {
-        id,
-        title,
-        url,
-        techs,
-        likes: repositories[repositoryIndex].likes
-    }
+  const repository = {
+      id,
+      title: title ? title !== undefined : repositories[repositoryIndex].title,
+      url: url ? url !== undefined : repositories[repositoryIndex].url,
+      techs: techs ? techs !== undefined : repositories[repositoryIndex].techs,
+      likes: repositories[repositoryIndex].likes
+  }
 
-    repositories[repositoryIndex] = repository;
+  repositories[repositoryIndex] = repository;
 
-    return response.json(repository);
+  return response.json(repository);
 });
 
 app.delete("/repositories/:id", validateId, (request, response) => {
@@ -97,6 +107,7 @@ app.post("/repositories/:id/like", validateId, (request, response) => {
   // através do id presente nos parâmetros da rota, a cada chamada dessa rota, o número de likes deve ser 
   // aumentado em 1
   const {id} = request.params;
+
   const repositoryIndex = repositories.findIndex(repository => repository.id === id);
     
     const repository = {
