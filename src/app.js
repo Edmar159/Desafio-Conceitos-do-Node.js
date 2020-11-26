@@ -29,7 +29,7 @@ function validateId(request,response,next){
 function validateUrl(request,response,next){
   const {url} = request.body;
   
-  if(url.indexOf('http://github.com/') === -1){
+  if(url.indexOf('https://github.com/') === -1){
     return response.status(200).json({ error:'Invalid URL !'});
   }
 
